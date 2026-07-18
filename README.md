@@ -15,6 +15,88 @@ any one AI session) can hold the whole thing in their head.
 
 ---
 
+## What "AI Scaffolding" means
+
+Construction scaffolding isn't the building — it's temporary structure
+that lets people work safely and consistently *while* the building goes
+up, then becomes largely invisible once the building can stand on its
+own. AI scaffolding, in the sense this repo means it, is the same idea
+applied to a codebase: a set of documents and habits that don't ship as
+part of the product, but that every AI session (and every human) works
+*inside of* while the product is being built.
+
+Concretely, it's three things working together:
+
+1. **A memory substitute.** An AI session has no memory of the last
+   session. `CLAUDE.md` and the ADR log are the durable memory a human
+   team would otherwise carry in their heads — read at the start of
+   every session, not reconstructed from scratch each time.
+2. **A pre-generation habit.** The checklist in `CLAUDE.md` runs
+   *before* code is written, not after — it changes what a session
+   optimizes for (search first, then generate) instead of trying to
+   catch the result after the fact.
+3. **A recurring, structural audit** that per-change review cannot do,
+   because per-change review only ever sees one change at a time, and
+   drift is only visible when the *whole* codebase is looked at at once.
+
+None of this is unique to AI-written code — good engineering teams do
+versions of all three already. What's different with AI assistance is
+the *rate*: a human team accumulates this kind of drift over years; an
+AI-assisted team can accumulate it in weeks, because generation is fast
+and each session's context genuinely resets. The scaffolding exists to
+make the discipline explicit and load-bearing, precisely because the
+old, implicit version — "the team just remembers" — doesn't transfer to
+a collaborator with no memory between sessions.
+
+---
+
+## The AI-assisted development lifecycle this scaffold assumes
+
+```mermaid
+flowchart LR
+    A["Plan\n(ADR if architectural)"] --> B["Pre-generation check\n(CLAUDE.md checklist)"]
+    B --> C["Generate\n(AI_PROMPTS.md templates)"]
+    C --> D["Review\n(CONTRIBUTING.md checklist)"]
+    D --> E["Test & Ship\n(CI_CD_PATTERNS.md)"]
+    E --> F["Audit\n(cadence in CLAUDE.md)"]
+    F --> G["Learn\n(CASE_STUDIES.md,\nCODE_AUDIT.md)"]
+    G -.->|feeds back into| A
+    G -.->|updates| B
+```
+
+Each stage maps to a real artifact in this repo, not an abstract idea:
+
+1. **Plan.** Decide what to build. If it's a real architectural choice —
+   not just a feature — write the ADR *before* or *alongside* building
+   it, not after, while the reasoning is still fresh and the
+   alternatives actually considered are still visible.
+2. **Pre-generation check.** Before any code gets written, run
+   `CLAUDE.md`'s checklist against the task: has this pattern been built
+   before, does it touch a shared helper, does it belong on the security
+   review trigger list.
+3. **Generate.** Write the code — human or AI session. Start from an
+   `AI_PROMPTS.md` template if the task fits an existing category,
+   rather than a blank prompt that optimizes only for "make it work."
+4. **Review.** PR review against `CONTRIBUTING.md`'s checklist. This is
+   real, necessary, and — this is the important part — *not sufficient
+   on its own*, because it only ever sees one change at a time.
+5. **Test & ship.** The CI gate, then a release that actually proves the
+   deployment works (`docs/CI_CD_PATTERNS.md`), not just that the build
+   succeeded.
+6. **Audit.** On a real, recurring cadence — not "whenever someone
+   remembers" — a dedicated pass asks the question step 4 structurally
+   cannot: does this whole subsystem, looked at all at once, still make
+   sense. Findings go in `docs/CODE_AUDIT.md`.
+7. **Learn.** When an audit (or an incident) finds real drift, write it
+   up in `docs/CASE_STUDIES.md` — and feed what was learned back into
+   `CLAUDE.md`'s checklist or invariants, so the *next* pass through this
+   loop starts from a slightly better step 2 than the last one did. This
+   is the step that makes the lifecycle a loop instead of a one-time
+   setup: the scaffolding is supposed to get more specific and more
+   useful over time, not stay in its initial, generic state.
+
+---
+
 ## What's in here, and why
 
 | File / folder | Purpose |
@@ -124,5 +206,11 @@ Then, **before writing any application code**:
 
 ## License
 
-[Choose a license for your new project — this scaffold itself is provided
-as-is for reuse; replace this section once you've cloned it.]
+This scaffold is [MIT licensed](LICENSE) — use it, fork it, modify it,
+build a company on top of it, no attribution required (though appreciated).
+
+For your new project: MIT is a reasonable default if you want maximum
+reuse with minimal friction, but it's your project's own choice, not
+inherited automatically from this scaffold. Replace [`LICENSE`](LICENSE)
+with whatever fits — MIT, Apache 2.0, a proprietary license, or
+something else — once you've cloned it.
