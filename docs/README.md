@@ -12,6 +12,7 @@ is stale.
 | [`../AI_PROMPTS.md`](../AI_PROMPTS.md) | Reusable prompt templates by task category |
 | [`architecture/decisions/`](architecture/decisions/) | ADRs — why each significant decision was made |
 | [`CASE_STUDIES.md`](CASE_STUDIES.md) | Real drift incidents from this project, once any exist |
+| [`CODE_AUDIT.md`](CODE_AUDIT.md) | Living, dated ledger of every audit run under `CLAUDE.md`'s Audit Cadence — what was checked, what was found, what changed |
 | [`CI_CD_PATTERNS.md`](CI_CD_PATTERNS.md) | Test-gate and release-smoke-test patterns |
 
 ## Authority rule (fill this in early)

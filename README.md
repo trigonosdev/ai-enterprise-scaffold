@@ -23,6 +23,7 @@ any one AI session) can hold the whole thing in their head.
 | [`AI_PROMPTS.md`](AI_PROMPTS.md) | A growing library of reusable, project-specific prompt templates, so each new task starts from a prompt that already encodes "search for existing patterns first," not a blank page. |
 | [`docs/architecture/decisions/`](docs/architecture/decisions/) | Architecture Decision Records (ADRs) — a permanent, append-only log of *why* each significant technical decision was made. The single best defense against an AI session "helpfully" reverting a decision it doesn't have the context for. |
 | [`docs/CASE_STUDIES.md`](docs/CASE_STUDIES.md) | Empty until this project has its first real drift incident. Then: write down what broke, why ordinary review missed it, and what question finally surfaced it. A real case study from *this* project is worth more than any amount of generic advice — including everything in this README. |
+| [`docs/CODE_AUDIT.md`](docs/CODE_AUDIT.md) | The living, dated ledger `CLAUDE.md`'s Audit Cadence writes into — every audit run, what it checked, what it found, what changed since last time. Explicitly not a certification; it's the evidence trail that the audits actually happen. |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Process and engineering conventions — the PR checklist, commit conventions, testing standards. |
 | [`docs/CI_CD_PATTERNS.md`](docs/CI_CD_PATTERNS.md) | Two CI/CD patterns worth adopting once there's real code: a test-suite gate, and a release pattern that includes an actual deployment smoke test — not just "build succeeded." Shown as copy-paste examples, not live workflow files, so a fresh clone doesn't show a failing check with nothing real to test yet. |
 
@@ -98,7 +99,12 @@ Then, **before writing any application code**:
    `docs/architecture/decisions/template.md`) — this is also a good forcing
    function to confirm you've actually read `CLAUDE.md` before writing
    anything else.
-4. If using Claude Code specifically: `CLAUDE.md` at the repo root is
+4. Put the first Audit Cadence run (`CLAUDE.md` → Audit Cadence) on an
+   actual calendar or milestone trigger now, while it's easy to commit to
+   — not after the codebase is already big enough that skipping it feels
+   tempting. `docs/CODE_AUDIT.md` is where each run's findings get
+   recorded, permanently, starting with the first one.
+5. If using Claude Code specifically: `CLAUDE.md` at the repo root is
    picked up automatically, every session, with no further setup.
 
 ## Keeping the scaffold current as the project grows

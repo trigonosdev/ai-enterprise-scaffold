@@ -302,7 +302,10 @@ In rough order of leverage:
 **What:** Full cross-file pattern detection across the whole codebase —
 not a single PR's diff
 **Output:** Filed as issues/tickets against a real milestone, not just
-narrated in chat
+narrated in chat — **and** a new dated entry in
+[`docs/CODE_AUDIT.md`](docs/CODE_AUDIT.md), the permanent ledger. Issues
+get closed and forgotten; the ledger is what proves, months later, that
+this cadence actually ran.
 **Trigger:** Start of each planning cycle, or after N feature PRs since
 the last one, whichever comes first
 
@@ -346,6 +349,9 @@ output's blind spots.
 - A guard clause that exists to block a dangerous action, with no test
   proving it actually blocks it — a guard nobody ever verified fires is
   not a control, it's documentation shaped like one
+
+**Output:** same as the general audit — real filed issues, plus a dated
+entry in `docs/CODE_AUDIT.md` recording what this specific pass covered.
 
 ### Deployment-Path Verification
 
