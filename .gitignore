@@ -1,0 +1,24 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Common dependency/build directories — trim to what this project
+# actually uses once its stack is chosen
+node_modules/
+venv/
+.venv/
+__pycache__/
+*.pyc
+dist/
+build/
