@@ -101,7 +101,7 @@ Each stage maps to a real artifact in this repo, not an abstract idea:
 
 | File / folder | Purpose |
 |---|---|
-| [`CLAUDE.md`](CLAUDE.md) | The core artifact. Loaded automatically by Claude Code (and readable by any AI tool) at the start of every session — the pre-generation checklist, architecture invariants, drift-prevention framework, and audit cadence. **This is what actually prevents drift**, not the folder structure around it. |
+| [`CLAUDE.md`](CLAUDE.md) | The core artifact. Loaded automatically by Claude Code (and readable by any AI tool) at the start of every session — the pre-generation checklist, architecture invariants, the drift-prevention framework, "Verify, Don't Assume" (a distinct failure mode: trusting reported success over actual state), and audit cadence. **This is what actually prevents both failure modes**, not the folder structure around it. |
 | [`AI_PROMPTS.md`](AI_PROMPTS.md) | A growing library of reusable, project-specific prompt templates, so each new task starts from a prompt that already encodes "search for existing patterns first," not a blank page. |
 | [`docs/architecture/decisions/`](docs/architecture/decisions/) | Architecture Decision Records (ADRs) — a permanent, append-only log of *why* each significant technical decision was made. The single best defense against an AI session "helpfully" reverting a decision it doesn't have the context for. |
 | [`docs/CASE_STUDIES.md`](docs/CASE_STUDIES.md) | Empty until this project has its first real drift incident. Then: write down what broke, why ordinary review missed it, and what question finally surfaced it. A real case study from *this* project is worth more than any amount of generic advice — including everything in this README. |

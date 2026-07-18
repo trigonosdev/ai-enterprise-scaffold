@@ -281,16 +281,111 @@ In rough order of leverage:
    inconsistent, propagate inconsistency everywhere downstream.
 
 5. **A tighter, risk-tiered audit for security/authorization and
-   deployment-infrastructure subsystems specifically** — both case
-   above tend to happen in exactly these two areas, and both are
-   categorically higher blast-radius than an ordinary feature area if
-   they drift silently.
+   deployment-infrastructure subsystems specifically** — drift tends to
+   concentrate in exactly these two areas, and both are categorically
+   higher blast-radius than an ordinary feature area if they drift
+   silently.
 
 6. **An automated, end-to-end smoke test proving the actual deployment
    path works — not just that the application code passes tests.** A
    green test suite has never meant "the documented deployment actually
    works" unless something explicitly, automatically proves the second
    claim too.
+
+---
+
+## Verify, Don't Assume
+
+This is a different failure mode from AI code drift, and it deserves its
+own section rather than living as a footnote under Deployment-Path
+Verification below. Drift is about cross-session memory loss producing
+*inconsistent* code. This is about trusting a *reported* success —
+a tool's exit code, a green check, a confident chain of reasoning —
+instead of checking the actual resulting state. Both are AI-assistance
+failure modes with no close human-only analogue at the same frequency;
+both need an explicit countermeasure, not just good intentions.
+
+### Where this bites hardest
+
+1. **A tool's exit code or stdout is not the same claim as "the state is
+   now what I intended."** A multi-file staging command that partially
+   fails on one bad path can silently leave the rest unstaged, with
+   nothing obviously wrong in the output — the fix isn't more careful
+   reading of output, it's re-checking the actual state (`git status`,
+   `git diff --cached`) before treating a step as done, every time, not
+   just when something feels off.
+
+2. **CI green is not the same claim as "the documented deployment
+   works."** Covered in depth under Deployment-Path Verification below —
+   the canonical instance of this principle, not the whole of it.
+
+3. **An authenticated or local context is not the same claim as "this
+   works for the person it's actually for."** Something can pass every
+   automated check while being completely broken for the actual external
+   user, if every check that ran had access the real user doesn't have.
+   Before shipping anything meant to work for an outside party — a
+   public download, an unauthenticated endpoint, a fresh signup flow —
+   test it from that exact vantage point, not from inside whatever
+   authenticated tooling built it. "It worked when I tried it" is only
+   evidence if "I" was standing where the real user stands.
+
+4. **Confident reasoning is not the same claim as empirical proof.**
+   "This should be safe because X, Y, Z" is a hypothesis, not a result —
+   even (especially) when it's airtight-sounding and produced under time
+   pressure to move faster. Test it anyway when the cost of being wrong
+   is real. The reasoning is still valuable — it's what tells you *what*
+   to test and *why* a given check would be conclusive — it just isn't a
+   substitute for running the test.
+
+### The habit this requires
+
+After every consequential action — a commit, a push, a merge, a deploy,
+a claim that something "now works" — verify against the actual source of
+truth, not the tool's own report of what it did:
+
+- After staging changes, look at the actual staged diff before
+  committing, not just the list of filenames.
+- After pushing, confirm against the remote (a fresh `git log`/API call
+  against the actual host), not just a lack of error output.
+- After claiming a fix works, reproduce the original failure first if
+  you haven't already — you cannot know a fix works if you never
+  independently confirmed what "broken" looked like.
+- Before declaring anything "done" that another party will rely on,
+  articulate what vantage point actually matters (an external
+  unauthenticated user? a fresh install? a cold cache?) and verify from
+  *that* vantage point specifically — not the most convenient one.
+
+None of this is about distrust of tools or of AI-generated output in
+general — it's specifically about the gap between "a step reported
+success" and "the thing that step was supposed to accomplish is actually
+true," which is a real, recurring gap, not a hypothetical one.
+
+### Who verifies matters, not just whether verification happened
+
+**An AI session must not be both the sole author and the sole approver
+of a change to a production or security-critical surface.** CI passing
+is not human review, and an AI session's own confidence that a change is
+safe is not human review either, no matter how thorough the session's
+own testing was — the entire point of a second, independent reviewer is
+catching what the first author's blind spots hid from them, and an AI
+session reviewing its own work shares its own blind spots by definition.
+
+This is a policy, not a preference:
+
+- Any change touching a file on the Security Review Trigger list below,
+  or a production deployment/database-configuration surface, requires an
+  explicit human sign-off before merge — a real person looking at the
+  actual diff, not a delegated "looks fine, ship it" given without
+  reading it.
+- If an AI session is about to merge, deploy, or otherwise finalize its
+  own change to one of these surfaces with no human checkpoint in the
+  loop, that is the moment to stop and ask, explicitly, rather than
+  proceed on the strength of automated checks alone.
+- "The user said go ahead earlier" does not retroactively cover a
+  specific, consequential action later unless that action was actually
+  named. Broad delegation ("handle it," "do everything") is not the same
+  authorization as a specific yes to a specific, named, high-stakes step —
+  ask again when the stakes step up, even if that feels like friction.
 
 ---
 
@@ -355,19 +450,28 @@ entry in `docs/CODE_AUDIT.md` recording what this specific pass covered.
 
 ### Deployment-Path Verification
 
-**This is the newer, harder-won lesson.** A fully green CI pipeline has
-never meant "the documented production deployment actually works" —
-those are different claims. Application tests validate application code
-against a test database set up in whatever way is fastest for CI, which
-is very often *not* the same way the documented production deployment
-sets one up. Nothing enforces the second claim unless something
-explicitly does.
+**The canonical instance of "Verify, Don't Assume" above, specific to
+deployment.** A fully green CI pipeline has never meant "the documented
+production deployment actually works" — those are different claims.
+Application tests validate application code against a test database set
+up in whatever way is fastest for CI, which is very often *not* the same
+way the documented production deployment sets one up. Nothing enforces
+the second claim unless something explicitly does.
 
 **Minimum bar:** an automated job, run on every release (not just
 occasionally by hand), that stands up the actual documented deployment
 mechanism from a genuinely empty starting state and asserts a real health
 check — not "containers started," an actual "the application inside is
 correctly serving requests" check — before a release is considered done.
+
+**Extend this to the actual consumer's vantage point, not just your
+own.** If the deployment mechanism is meant to work for an external
+party (a downloaded installer, a public package, a pulled container
+image), the smoke test above needs to run from an equivalently
+unauthenticated, external position — not from inside CI's own
+authenticated tooling, which can have access a real outside user simply
+doesn't. A green smoke test that only ever ran authenticated proves
+less than it looks like it proves.
 
 ---
 
@@ -384,6 +488,12 @@ to this project:
 [ ] Are all new business thresholds named constants?
 [ ] Is every new function under this project's size guideline?
 [ ] Does every new list endpoint use the shared pagination helper?
+[ ] Did I verify the actual result (staged diff, real remote state, a
+    reproduced fix) rather than trusting a tool's reported success?
+    (See "Verify, Don't Assume" above.)
+[ ] If this touches a Security Review Trigger file or a production
+    surface: has an actual human reviewed the diff — not just CI, not
+    just the author's own confidence?
 ```
 
 ## Security Review Trigger

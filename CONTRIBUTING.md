@@ -38,6 +38,13 @@ Every PR should be able to answer these before merge:
 [ ] Does this need a new ADR, or does it contradict an existing one?
 [ ] Is there a test? If not, is that explicitly called out and justified,
     not silently skipped?
+[ ] Was the actual result verified (real diff, real remote state, a
+    reproduced fix) rather than trusted from a tool's reported success?
+    (CLAUDE.md, "Verify, Don't Assume")
+[ ] If this touches a Security Review Trigger file or a production
+    surface: has a real human reviewed the diff — not just CI, not just
+    the author's own confidence? An AI-authored change must not be both
+    its own author and its own approver here.
 ```
 
 ## Commit messages
